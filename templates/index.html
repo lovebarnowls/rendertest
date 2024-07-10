@@ -1,0 +1,65 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Math Quiz</title>
+    <style>
+        body { font-family: Arial, sans-serif; max-width: 800px; margin: 0 auto; padding: 20px; }
+        .question { margin-bottom: 20px; }
+        button { margin-top: 20px; }
+    </style>
+</head>
+<body>
+    <h1>Simple Math Quiz</h1>
+    <form id="quiz-form">
+        {% for i, q in enumerate(questions) %}
+        <div class="question">
+            <p>{{ i+1 }}. {{ q.question }}</p>
+            {% for option in q.options %}
+            <label>
+                <input type="radio" name="{{ i }}" value="{{ option }}"> {{ option }}
+            </label>
+            {% endfor %}
+        </div>
+        {% endfor %}
+        <button type="submit">Submit Answers</button>
+    </form>
+    <div id="results" style="display: none;"></div>
+
+    <script>
+        document.getElementById('quiz-form').addEventListener('submit', function(e) {
+            e.preventDefault();
+            const formData = new FormData(this);
+            const answers = {};
+            for (let [key, value] of formData.entries()) {
+                answers[key] = value;
+            }
+            
+            fetch('/check_answers', {
+                method: 'POST',
+                headers: {
+                    'Content-Type': 'application/json',
+                },
+                body: JSON.stringify(answers),
+            })
+            .then(response => response.json())
+            .then(data => {
+                const resultsDiv = document.getElementById('results');
+                resultsDiv.innerHTML = `<h2>Your Score: ${data.score} / ${data.total}</h2>`;
+                data.results.forEach((result, index) => {
+                    resultsDiv.innerHTML += `
+                        <p>
+                            ${index + 1}. ${result.question}<br>
+                            Your answer: ${result.user_answer || 'Not answered'}<br>
+                            Correct answer: ${result.correct_answer}<br>
+                            ${result.is_correct ? '✅ Correct' : '❌ Incorrect'}
+                        </p>
+                    `;
+                });
+                resultsDiv.style.display = 'block';
+            });
+        });
+    </script>
+</body>
+</html>
