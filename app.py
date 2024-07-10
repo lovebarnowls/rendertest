@@ -25,7 +25,9 @@ questions = [
 @app.route('/')
 def index():
     try:
-        return render_template('index.html', questions=questions)
+        # Enumerate questions here instead of in the template
+        enumerated_questions = list(enumerate(questions))
+        return render_template('index.html', enumerated_questions=enumerated_questions)
     except Exception as e:
         app.logger.error(f"An error occurred: {str(e)}")
         return "An error occurred", 500
