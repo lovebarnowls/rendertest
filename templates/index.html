@@ -13,7 +13,7 @@
 <body>
     <h1>Simple Math Quiz</h1>
     <form id="quiz-form">
-        {% for i, q in enumerate(questions) %}
+        {% for i, q in enumerated_questions %}
         <div class="question">
             <p>{{ i+1 }}. {{ q.question }}</p>
             {% for option in q.options %}
